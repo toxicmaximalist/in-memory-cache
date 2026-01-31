@@ -1,11 +1,17 @@
-/**
- * This file has no direct purpose
- * It just exists for cargo project to define entry main file
- * In-memory database is run directly from the bin
- */
+//! Entry point for the in-memory cache library.
+//!
+//! This file exists for cargo to have a default binary target.
+//! For actual usage, run the server or client binaries:
+//!
+//! ```bash
+//! cargo run --bin server
+//! cargo run --bin client get <key>
+//! ```
 
-pub mod utils;
-
-pub fn main() {
-    unimplemented!();
+fn main() {
+    eprintln!("This binary is not intended to be run directly.");
+    eprintln!("Use one of the following commands:");
+    eprintln!("  cargo run --bin server       - Start the cache server");
+    eprintln!("  cargo run --bin client <cmd> - Run client commands");
+    std::process::exit(1);
 }

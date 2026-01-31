@@ -1,15 +1,33 @@
 [package]
 name = "in-memory-cache"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Ilia Sichinava"]
+description = "A fast, thread-safe, in-memory cache with TTL and LRU eviction"
+license = "MIT"
+repository = "https://github.com/yourusername/in-memory-cache"
+keywords = ["cache", "lru", "ttl", "concurrent", "memory"]
+categories = ["caching", "data-structures", "concurrency"]
+rust-version = "1.70"
 
 [dependencies]
-tokio = { version="1", features = ["full"] }
-bytes = { version = "1" }
-clap = { version = "3.1.18", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+bytes = "1"
+clap = { version = "4", features = ["derive"] }
+indexmap = "2"
 
-# [[bin]]
-# name = "server"
-# path = "src/bin/server.rs"
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1"
+
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/bin/client.rs"
+
+[[bench]]
+name = "cache_bench"
+harness = false
