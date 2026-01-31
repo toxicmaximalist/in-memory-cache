@@ -287,11 +287,11 @@ mod tests {
     #[test]
     fn test_cache_basic_operations() {
         let cache = Cache::default();
-        
+
         cache.set("key", "value");
         assert_eq!(cache.get("key"), Some(Bytes::from("value")));
         assert!(cache.contains("key"));
-        
+
         cache.delete("key");
         assert!(!cache.contains("key"));
     }
@@ -300,12 +300,12 @@ mod tests {
     fn test_cache_is_clone() {
         let cache1 = Cache::default();
         cache1.set("key", "value");
-        
+
         let cache2 = cache1.clone();
-        
+
         // Both point to the same underlying data
         assert_eq!(cache2.get("key"), Some(Bytes::from("value")));
-        
+
         cache2.set("key2", "value2");
         assert_eq!(cache1.get("key2"), Some(Bytes::from("value2")));
     }
@@ -313,11 +313,11 @@ mod tests {
     #[test]
     fn test_cache_stats() {
         let cache = Cache::default();
-        
+
         cache.set("key", "value");
         let _ = cache.get("key");
         let _ = cache.get("missing");
-        
+
         let stats = cache.stats();
         assert_eq!(stats.hits, 1);
         assert_eq!(stats.misses, 1);
@@ -326,10 +326,10 @@ mod tests {
     #[test]
     fn test_cache_thread_safety() {
         use std::thread;
-        
+
         let cache = Cache::default();
         let mut handles = vec![];
-        
+
         // Spawn multiple threads that read/write concurrently
         for i in 0..10 {
             let cache = cache.clone();
@@ -342,12 +342,12 @@ mod tests {
             });
             handles.push(handle);
         }
-        
+
         for handle in handles {
             handle.join().unwrap();
         }
-        
+
         // Should have completed without panics
-        assert!(cache.len() > 0);
+        assert!(!cache.is_empty());
     }
 }

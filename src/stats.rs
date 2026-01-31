@@ -189,11 +189,11 @@ mod tests {
     #[test]
     fn test_record_operations() {
         let stats = CacheStats::new();
-        
+
         stats.record_hit();
         stats.record_hit();
         stats.record_miss();
-        
+
         assert_eq!(stats.hits(), 2);
         assert_eq!(stats.misses(), 1);
     }
@@ -201,27 +201,27 @@ mod tests {
     #[test]
     fn test_hit_rate() {
         let stats = CacheStats::new();
-        
+
         // No operations = 0% hit rate
         assert_eq!(stats.hit_rate(), 0.0);
-        
+
         // 3 hits, 1 miss = 75% hit rate
         stats.record_hit();
         stats.record_hit();
         stats.record_hit();
         stats.record_miss();
-        
+
         assert!((stats.hit_rate() - 75.0).abs() < 0.01);
     }
 
     #[test]
     fn test_size_tracking() {
         let stats = CacheStats::new();
-        
+
         stats.increment_size();
         stats.increment_size();
         assert_eq!(stats.size(), 2);
-        
+
         stats.decrement_size();
         assert_eq!(stats.size(), 1);
     }
@@ -232,7 +232,7 @@ mod tests {
         stats.record_hit();
         stats.record_set();
         stats.increment_size();
-        
+
         let snapshot = stats.snapshot();
         assert_eq!(snapshot.hits, 1);
         assert_eq!(snapshot.sets, 1);

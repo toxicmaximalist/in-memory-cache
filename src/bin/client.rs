@@ -18,7 +18,7 @@ const DEFAULT_PORT: u16 = 3000;
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
-    
+
     let addr = format!("{}:{}", DEFAULT_HOST, DEFAULT_PORT);
     let mut stream = match TcpStream::connect(&addr).await {
         Ok(s) => s,

@@ -25,10 +25,7 @@ pub enum CacheError {
     IoError(io::Error),
 
     /// The cache has reached its maximum capacity.
-    CapacityExceeded {
-        current: usize,
-        max: usize,
-    },
+    CapacityExceeded { current: usize, max: usize },
 
     /// The provided key is invalid (empty, too long, etc.).
     InvalidKey(String),
@@ -87,8 +84,14 @@ mod tests {
         let err = CacheError::InvalidCommand("foo".to_string());
         assert_eq!(format!("{}", err), "invalid command: 'foo'");
 
-        let err = CacheError::CapacityExceeded { current: 100, max: 100 };
-        assert_eq!(format!("{}", err), "capacity exceeded: 100 items (max: 100)");
+        let err = CacheError::CapacityExceeded {
+            current: 100,
+            max: 100,
+        };
+        assert_eq!(
+            format!("{}", err),
+            "capacity exceeded: 100 items (max: 100)"
+        );
     }
 
     #[test]

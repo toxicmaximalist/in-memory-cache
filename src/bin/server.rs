@@ -33,19 +33,19 @@ impl Default for ServerConfig {
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ServerConfig::default();
-    
+
     // Build cache configuration
     let cache_config = CacheConfig::new()
         .max_capacity(config.max_capacity.unwrap_or(0))
         .build();
-    
+
     // Create the shared cache
     let cache = Arc::new(Cache::new(cache_config));
-    
+
     // Bind the listener
     let addr = format!("{}:{}", config.host, config.port);
     let listener = TcpListener::bind(&addr).await?;
-    
+
     println!("Cache server listening on {}", addr);
     println!("Max capacity: {:?}", config.max_capacity);
 
@@ -55,8 +55,10 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Ok(()) = signal::ctrl_c().await {
             println!("\nShutting down...");
             let stats = shutdown_cache.stats();
-            println!("Final stats: hits={}, misses={}, size={}", 
-                stats.hits, stats.misses, stats.size);
+            println!(
+                "Final stats: hits={}, misses={}, size={}",
+                stats.hits, stats.misses, stats.size
+            );
         }
     });
 
@@ -65,10 +67,10 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         match listener.accept().await {
             Ok((socket, addr)) => {
                 println!("Connection from {}", addr);
-                
+
                 // Clone the cache handle for this connection
                 let cache = Arc::clone(&cache);
-                
+
                 // Spawn a task to handle this connection
                 tokio::spawn(async move {
                     if let Err(e) = handle_connection(socket, cache).await {
@@ -98,7 +100,7 @@ async fn handle_connection(
 
     // Parse the command
     let attrs = buffer_to_array(&mut buf);
-    
+
     if attrs.is_empty() {
         socket.write_all(b"ERR empty command").await?;
         return Ok(());
@@ -111,22 +113,18 @@ async fn handle_connection(
 
     // Send the response
     socket.write_all(response.as_bytes()).await?;
-    
+
     Ok(())
 }
 
 /// Process a cache command and return the response.
-async fn process_command(
-    command: Command,
-    attrs: &[String],
-    cache: &Cache,
-) -> String {
+async fn process_command(command: Command, attrs: &[String], cache: &Cache) -> String {
     match command {
         Command::Get => {
             if attrs.len() < 2 {
                 return "ERR missing key argument".to_string();
             }
-            
+
             let key = &attrs[1];
             match cache.get(key) {
                 Some(value) => {
@@ -144,13 +142,13 @@ async fn process_command(
             if attrs.len() < 3 {
                 return "ERR missing key or value argument".to_string();
             }
-            
+
             let key = &attrs[1];
             let value = &attrs[2];
-            
+
             let existed = cache.contains(key);
             cache.set(key.clone(), value.clone());
-            
+
             if existed {
                 "r Ok".to_string() // Replaced
             } else {
@@ -162,7 +160,7 @@ async fn process_command(
             if attrs.len() < 2 {
                 return "ERR missing key argument".to_string();
             }
-            
+
             let key = &attrs[1];
             if cache.delete(key) {
                 "Ok".to_string()
@@ -171,9 +169,7 @@ async fn process_command(
             }
         }
 
-        Command::Ping => {
-            "PONG".to_string()
-        }
+        Command::Ping => "PONG".to_string(),
 
         Command::Stats => {
             let stats = cache.stats();
@@ -184,7 +180,10 @@ async fn process_command(
         }
 
         Command::Invalid => {
-            format!("ERR unknown command '{}'", attrs.first().unwrap_or(&String::new()))
+            format!(
+                "ERR unknown command '{}'",
+                attrs.first().unwrap_or(&String::new())
+            )
         }
     }
 }

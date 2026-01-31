@@ -188,7 +188,9 @@ fn test_cache_clone_shares_data() {
     // Modification through one is visible to the other
     cache2.set("key", "value2");
     assert_eq!(
-        cache1.get("key").map(|b| String::from_utf8_lossy(&b).to_string()),
+        cache1
+            .get("key")
+            .map(|b| String::from_utf8_lossy(&b).to_string()),
         Some("value2".to_string())
     );
 }

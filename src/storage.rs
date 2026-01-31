@@ -52,7 +52,7 @@ impl Db {
         // First, try to read with a read lock
         {
             let entries = self.read_lock()?;
-            
+
             if let Some(entry) = entries.get(key) {
                 if entry.is_expired() {
                     // Entry expired - need write lock to remove it
@@ -62,11 +62,11 @@ impl Db {
                     self.stats.record_expiration();
                     return None;
                 }
-                
+
                 // Clone the value before dropping the read lock
                 let value = entry.value().clone();
                 self.stats.record_hit();
-                
+
                 // Update access time (need write lock)
                 drop(entries);
                 if let Some(mut entries) = self.write_lock() {
@@ -79,11 +79,11 @@ impl Db {
                         entries.move_index(idx, new_idx);
                     }
                 }
-                
+
                 return Some(value);
             }
         }
-        
+
         self.stats.record_miss();
         None
     }
@@ -92,7 +92,7 @@ impl Db {
     pub fn set(&self, key: impl Into<String>, value: impl Into<Bytes>) {
         let key = key.into();
         let value = value.into();
-        
+
         let ttl = self.config.default_ttl;
         self.set_internal(key, value, ttl);
     }
@@ -101,7 +101,7 @@ impl Db {
     pub fn set_with_ttl(&self, key: impl Into<String>, value: impl Into<Bytes>, ttl: Duration) {
         let key = key.into();
         let value = value.into();
-        
+
         self.set_internal(key, value, Some(ttl));
     }
 
@@ -272,10 +272,8 @@ impl Default for Db {
 // Implement Clone by creating a new Db with cloned data
 impl Clone for Db {
     fn clone(&self) -> Self {
-        let entries = self.read_lock()
-            .map(|e| e.clone())
-            .unwrap_or_default();
-        
+        let entries = self.read_lock().map(|e| e.clone()).unwrap_or_default();
+
         Self {
             entries: RwLock::new(entries),
             config: self.config.clone(),
@@ -295,16 +293,16 @@ impl Db {
     pub fn write(&self, arr: &[String]) -> CacheResult<&'static str> {
         if arr.len() < 3 {
             return Err(CacheError::ParseError(
-                "write requires at least 3 arguments: command key value".to_string()
+                "write requires at least 3 arguments: command key value".to_string(),
             ));
         }
 
         let key = &arr[1];
         let value = &arr[2];
-        
+
         let existed = self.contains(key);
         self.set(key.clone(), value.clone());
-        
+
         if existed {
             Ok("r Ok") // Replaced existing key
         } else {
@@ -320,7 +318,7 @@ impl Db {
     pub fn read(&self, arr: &[String]) -> CacheResult<Bytes> {
         if arr.len() < 2 {
             return Err(CacheError::ParseError(
-                "read requires at least 2 arguments: command key".to_string()
+                "read requires at least 2 arguments: command key".to_string(),
             ));
         }
 
@@ -337,17 +335,17 @@ mod tests {
     #[test]
     fn test_basic_set_get() {
         let db = Db::with_defaults();
-        
+
         db.set("key1", "value1");
         let result = db.get("key1");
-        
+
         assert_eq!(result, Some(Bytes::from("value1")));
     }
 
     #[test]
     fn test_get_nonexistent() {
         let db = Db::with_defaults();
-        
+
         let result = db.get("nonexistent");
         assert!(result.is_none());
     }
@@ -355,10 +353,10 @@ mod tests {
     #[test]
     fn test_delete() {
         let db = Db::with_defaults();
-        
+
         db.set("key1", "value1");
         assert!(db.contains("key1"));
-        
+
         let deleted = db.delete("key1");
         assert!(deleted);
         assert!(!db.contains("key1"));
@@ -367,7 +365,7 @@ mod tests {
     #[test]
     fn test_delete_nonexistent() {
         let db = Db::with_defaults();
-        
+
         let deleted = db.delete("nonexistent");
         assert!(!deleted);
     }
@@ -375,10 +373,10 @@ mod tests {
     #[test]
     fn test_overwrite() {
         let db = Db::with_defaults();
-        
+
         db.set("key1", "value1");
         db.set("key1", "value2");
-        
+
         assert_eq!(db.get("key1"), Some(Bytes::from("value2")));
         assert_eq!(db.len(), 1);
     }
@@ -386,11 +384,11 @@ mod tests {
     #[test]
     fn test_clear() {
         let db = Db::with_defaults();
-        
+
         db.set("key1", "value1");
         db.set("key2", "value2");
         assert_eq!(db.len(), 2);
-        
+
         db.clear();
         assert!(db.is_empty());
     }
@@ -399,12 +397,12 @@ mod tests {
     fn test_capacity_eviction() {
         let config = CacheConfig::new().max_capacity(3).build();
         let db = Db::new(config);
-        
+
         db.set("key1", "value1");
         db.set("key2", "value2");
         db.set("key3", "value3");
         assert_eq!(db.len(), 3);
-        
+
         // This should evict key1 (oldest)
         db.set("key4", "value4");
         assert_eq!(db.len(), 3);
@@ -416,17 +414,17 @@ mod tests {
     fn test_lru_eviction_order() {
         let config = CacheConfig::new().max_capacity(3).build();
         let db = Db::new(config);
-        
+
         db.set("key1", "value1");
         db.set("key2", "value2");
         db.set("key3", "value3");
-        
+
         // Access key1, making it recently used
         let _ = db.get("key1");
-        
+
         // Now key2 should be the LRU
         db.set("key4", "value4");
-        
+
         assert!(db.contains("key1")); // Was accessed, not evicted
         assert!(!db.contains("key2")); // Was LRU, evicted
         assert!(db.contains("key3"));
@@ -436,16 +434,16 @@ mod tests {
     #[test]
     fn test_ttl_expiration() {
         let db = Db::with_defaults();
-        
+
         // Set with very short TTL
         db.set_with_ttl("key1", "value1", Duration::from_millis(1));
-        
+
         // Should exist immediately
         assert!(db.contains("key1"));
-        
+
         // Wait for expiration
         std::thread::sleep(Duration::from_millis(10));
-        
+
         // Should be expired
         assert!(db.get("key1").is_none());
     }
@@ -453,11 +451,11 @@ mod tests {
     #[test]
     fn test_stats_tracking() {
         let db = Db::with_defaults();
-        
+
         db.set("key1", "value1");
         let _ = db.get("key1"); // Hit
         let _ = db.get("nonexistent"); // Miss
-        
+
         let stats = db.stats();
         assert_eq!(stats.hits(), 1);
         assert_eq!(stats.misses(), 1);
@@ -468,11 +466,11 @@ mod tests {
     #[allow(deprecated)]
     fn test_legacy_write_read() {
         let db = Db::with_defaults();
-        
+
         let arr = vec!["set".to_string(), "key1".to_string(), "value1".to_string()];
         let result = db.write(&arr);
         assert!(result.is_ok());
-        
+
         let arr = vec!["get".to_string(), "key1".to_string()];
         let result = db.read(&arr);
         assert_eq!(result.unwrap(), Bytes::from("value1"));
@@ -482,7 +480,7 @@ mod tests {
     #[allow(deprecated)]
     fn test_legacy_read_missing_args() {
         let db = Db::with_defaults();
-        
+
         let arr = vec!["get".to_string()]; // Missing key
         let result = db.read(&arr);
         assert!(result.is_err());

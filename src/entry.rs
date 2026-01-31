@@ -61,6 +61,7 @@ impl Entry {
 
     /// Update the last accessed time to a specific instant.
     /// This is useful for testing with a controlled clock.
+    #[allow(dead_code)]
     pub fn touch_at(&mut self, now: Instant) {
         self.last_accessed = now;
     }
@@ -71,11 +72,13 @@ impl Entry {
     }
 
     /// Get the expiration time, if set.
+    #[allow(dead_code)]
     pub fn expires_at(&self) -> Option<Instant> {
         self.expires_at
     }
 
     /// Get the last accessed time.
+    #[allow(dead_code)]
     pub fn last_accessed(&self) -> Instant {
         self.last_accessed
     }
@@ -112,11 +115,11 @@ mod tests {
     fn test_touch_updates_access_time() {
         let mut entry = Entry::new(Bytes::from("test"));
         let initial = entry.last_accessed;
-        
+
         // Small delay to ensure time advances
         std::thread::sleep(Duration::from_millis(1));
         entry.touch();
-        
+
         assert!(entry.last_accessed > initial);
     }
 }

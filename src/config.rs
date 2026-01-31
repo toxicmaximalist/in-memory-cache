@@ -80,7 +80,11 @@ impl CacheConfig {
     /// The background task will run at this interval to remove expired entries.
     /// This is in addition to lazy expiration (entries checked on access).
     pub fn cleanup_interval(mut self, interval: Duration) -> Self {
-        self.cleanup_interval = if interval.is_zero() { None } else { Some(interval) };
+        self.cleanup_interval = if interval.is_zero() {
+            None
+        } else {
+            Some(interval)
+        };
         self
     }
 

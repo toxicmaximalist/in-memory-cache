@@ -24,11 +24,11 @@ use crate::error::{CacheError, CacheResult};
 pub fn buffer_to_array(buf: &mut BytesMut) -> Vec<String> {
     let mut vec = vec![];
     let length = buf.len();
-    
+
     if length == 0 {
         return vec;
     }
-    
+
     let mut word = String::new();
 
     for i in 0..length {
@@ -63,11 +63,11 @@ pub fn buffer_to_array(buf: &mut BytesMut) -> Vec<String> {
 /// A vector of at least one string, or an error.
 pub fn parse_command(buf: &mut BytesMut) -> CacheResult<Vec<String>> {
     let parts = buffer_to_array(buf);
-    
+
     if parts.is_empty() {
         return Err(CacheError::ParseError("empty command".to_string()));
     }
-    
+
     Ok(parts)
 }
 
