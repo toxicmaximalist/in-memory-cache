@@ -1,8 +1,7 @@
 # In-Memory Cache
 
-[![CI](https://github.com/yourusername/in-memory-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/in-memory-cache/actions)
-[![Crates.io](https://img.shields.io/crates/v/in-memory-cache.svg)](https://crates.io/crates/in-memory-cache)
-[![Documentation](https://docs.rs/in-memory-cache/badge.svg)](https://docs.rs/in-memory-cache)
+[![CI](https://github.com/toxicmaximalist/in-memory-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/toxicmaximalist/in-memory-cache/actions)
+[![Docs](https://github.com/toxicmaximalist/in-memory-cache/actions/workflows/docs.yml/badge.svg)](https://toxicmaximalist.github.io/in-memory-cache/in_memory_cache/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A fast, thread-safe, in-memory cache library for Rust with TTL support and LRU eviction.

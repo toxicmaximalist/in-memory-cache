@@ -5,10 +5,14 @@ edition = "2021"
 authors = ["Ilia Sichinava"]
 description = "A fast, thread-safe, in-memory cache with TTL and LRU eviction"
 license = "MIT"
-repository = "https://github.com/yourusername/in-memory-cache"
+repository = "https://github.com/toxicmaximalist/in-memory-cache"
+homepage = "https://github.com/toxicmaximalist/in-memory-cache"
+documentation = "https://toxicmaximalist.github.io/in-memory-cache/in_memory_cache/"
+readme = "README.md"
 keywords = ["cache", "lru", "ttl", "concurrent", "memory"]
 categories = ["caching", "data-structures", "concurrency"]
 rust-version = "1.70"
+exclude = [".github/*", "benches/*", "tests/*"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
