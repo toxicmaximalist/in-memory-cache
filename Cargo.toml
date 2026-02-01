@@ -2,7 +2,7 @@
 name = "in-memory-cache"
 version = "1.0.0"
 edition = "2021"
-authors = ["Ilia Sichinava"]
+authors = ["toxicmaximalist"]
 description = "A fast, thread-safe, in-memory cache with TTL and LRU eviction"
 license = "MIT"
 repository = "https://github.com/toxicmaximalist/in-memory-cache"
